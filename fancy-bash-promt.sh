@@ -106,6 +106,28 @@ bash_prompt_command() {
 		NEW_PWD=${NEW_PWD:$pwdoffset:$pwdmaxlen}
 		NEW_PWD=${trunc_symbol}/${NEW_PWD#*/}
 	fi
+
+	# additional for git
+	parse_git_branch
+	#necessary data
+	THE_COLOR='30'
+	THE_BG='40'
+
+
+	if [ -z $NEW_GIT ]
+		then 
+			BACKGROUND_4_SPECIAL='9'
+			NEW_GIT=$""
+			TRIANGLE_SPECIAL=$''
+			# echo "leer"
+		else
+			BACKGROUND_4_SPECIAL='62'
+			TRIANGLE_SPECIAL=$'\uE0B0'
+			# echo "voll"
+	fi
+	BG4_SPECIAL=$(($BACKGROUND_4_SPECIAL+$THE_BG))
+	TSBG3=$(($BACKGROUND_4_SPECIAL+$THE_BG))
+	TSFC4=$(($THE_COLOR+$BACKGROUND_4_SPECIAL))
 }
 
 
@@ -136,6 +158,23 @@ format_font()
 	esac
 }
 
+##
+## INTEGRATE GIT-INFO
+##
+parse_git_branch() {
+     
+    NEW_GIT=$(git branch 2> /dev/null | sed -e '/^[^*]/d' -e 's/* \(.*\)/ (\1) /')
+
+}
+
+# if [ -z $(parse_git_branch) ]
+# 	then
+# 		IS_GIT_DIR=false
+# 		echo "It's not a git dir! $(parse_git_branch) haha"
+# 	else
+# 		echo "It says $(parse_git_branch) --> git dir"
+# 		IS_GIT_DIR=true
+# fi
 
 
 ##
@@ -225,6 +264,10 @@ bash_prompt() {
 	local FONT_COLOR_3=$D_GRAY
 	local BACKGROUND_3=$WHITE
 	local TEXTEFFECT_3=$BOLD
+
+	local FONT_COLOR_4=$D_GRAY
+	# local BACKGROUND_4=$L_GREEN
+	local TEXTEFFECT_4=$BOLD
 	
 	local PROMT_FORMAT=$BLUE_BOLD
 
@@ -319,14 +362,18 @@ bash_prompt() {
 	format_font TEXT_FORMAT_1 $FE1 $FC1 $BG1
 	format_font TEXT_FORMAT_2 $FE2 $FC2 $BG2
 	format_font TEXT_FORMAT_3 $FC3 $FE3 $BG3
-	format_font TEXT_FORMAT_4 $FC4 $FE4 $BG4
+	format_font TEXT_FORMAT_4 $FC4 $FE4 $"\${BG4_SPECIAL}"
 	
 	
 	# GENERATE PROMT SECTIONS
 	local PROMT_USER=$"$TEXT_FORMAT_1 \u "
 	local PROMT_HOST=$"$TEXT_FORMAT_2 \h "
 	local PROMT_PWD=$"$TEXT_FORMAT_3 \${NEW_PWD} "
+	local PROMT_GIT_INFO=$"$TEXT_FORMAT_4\${NEW_GIT}"
+	# local PROMT_GIT=$"$TEXT_FORMAT_4 \$(parse_git_branch)"
 	local PROMT_INPUT=$"$PROMT_FORMAT "
+
+
 
 
 	############################################################################
@@ -343,16 +390,21 @@ bash_prompt() {
 	TSBG2=$(($BACKGROUND_3+$BG))
 	
 	TSFC3=$(($BACKGROUND_3+$COLOR))
-	TSBG3=$(($DEFAULT+$BG))
+	# TSBG3=$(($BACKGROUND_4_SPECIAL+$BG))
+
+	# TSFC4=$(($BACKGROUND_4_SPECIAL+$COLOR))
+	TSBG4=$(($DEFAULT+$BG))
 	
 
 	## CALL FORMATING HELPER FUNCTION: effect + font color + BG color
 	local SEPARATOR_FORMAT_1
 	local SEPARATOR_FORMAT_2
 	local SEPARATOR_FORMAT_3
+	local SEPARATOR_FORMAT_4
 	format_font SEPARATOR_FORMAT_1 $TSFC1 $TSBG1
 	format_font SEPARATOR_FORMAT_2 $TSFC2 $TSBG2
-	format_font SEPARATOR_FORMAT_3 $TSFC3 $TSBG3
+	format_font SEPARATOR_FORMAT_3 $TSFC3 $"\${TSBG3}"
+	format_font SEPARATOR_FORMAT_4 $"\${TSFC4}" $TSBG4
 	
 
 	# GENERATE SEPARATORS WITH FANCY TRIANGLE
@@ -360,6 +412,7 @@ bash_prompt() {
 	local SEPARATOR_1=$SEPARATOR_FORMAT_1$TRIANGLE
 	local SEPARATOR_2=$SEPARATOR_FORMAT_2$TRIANGLE
 	local SEPARATOR_3=$SEPARATOR_FORMAT_3$TRIANGLE
+	local SEPARATOR_4=$"$SEPARATOR_FORMAT_4\${TRIANGLE_SPECIAL}"
 
 
 
@@ -382,9 +435,10 @@ bash_prompt() {
 	## BASH PROMT                                                             ##
 	## Generate promt and remove format from the rest                         ##
 	############################################################################
-	PS1="$TITLEBAR\n${PROMT_USER}${SEPARATOR_1}${PROMT_HOST}${SEPARATOR_2}${PROMT_PWD}${SEPARATOR_3}${PROMT_INPUT}"
+	PS1="$TITLEBAR\n${PROMT_USER}${SEPARATOR_1}${PROMT_HOST}${SEPARATOR_2}${PROMT_PWD}${SEPARATOR_3}${PROMT_GIT_INFO}${SEPARATOR_4}${PROMT_INPUT}"
+	# PS1="$TITLEBAR\n${PROMT_USER}${SEPARATOR_1}${PROMT_HOST}${SEPARATOR_2}${PROMT_PWD}${SEPARATOR_3}${GIT_INFO}${PROMT_INPUT}"
 
-	
+
 
 	## For terminal line coloring, leaving the rest standard
 	none="$(tput sgr0)"
