@@ -121,13 +121,22 @@ bash_prompt_command() {
 			TRIANGLE_SPECIAL=$''
 			# echo "leer"
 		else
-			BACKGROUND_4_SPECIAL='62'
+			# host depending:
+			BACKGROUND_4_SPECIAL='63'
+			if [ "$HOSTNAME" = chronos ]; then
+					BACKGROUND_4_SPECIAL='63'
+			fi
+			if [ "$HOSTNAME" = aphrodite ]; then
+					BACKGROUND_4_SPECIAL='63'
+			fi
 			TRIANGLE_SPECIAL=$'\uE0B0'
 			# echo "voll"
 	fi
 	BG4_SPECIAL=$(($BACKGROUND_4_SPECIAL+$THE_BG))
 	TSBG3=$(($BACKGROUND_4_SPECIAL+$THE_BG))
 	TSFC4=$(($THE_COLOR+$BACKGROUND_4_SPECIAL))
+
+	
 }
 
 
@@ -254,22 +263,22 @@ bash_prompt() {
 	## Choose your color combination here                                     ##
 	############################################################################
 	local FONT_COLOR_1=$WHITE
-	local BACKGROUND_1=$BLUE
+	local BACKGROUND_1=$GREEN
 	local TEXTEFFECT_1=$BOLD
 	
-	local FONT_COLOR_2=$WHITE
-	local BACKGROUND_2=$L_BLUE
+	local FONT_COLOR_2=$D_GRAY
+	local BACKGROUND_2=$L_GREEN
 	local TEXTEFFECT_2=$BOLD
 	
 	local FONT_COLOR_3=$D_GRAY
 	local BACKGROUND_3=$WHITE
 	local TEXTEFFECT_3=$BOLD
 
-	local FONT_COLOR_4=$D_GRAY
+	local FONT_COLOR_4=$BLACK
 	# local BACKGROUND_4=$L_GREEN
-	local TEXTEFFECT_4=$BOLD
+	local TEXTEFFECT_4=$BLINK
 	
-	local PROMT_FORMAT=$BLUE_BOLD
+	local PROMT_FORMAT=$TOXIC_GREEN_BOLD
 
 	
 	############################################################################
@@ -278,10 +287,11 @@ bash_prompt() {
 	############################################################################
 	
 	## CONFIGURATION: BLUE-WHITE
-	if [ "$HOSTNAME" = dell ]; then
+	if [ "$HOSTNAME" = chronos ]; then
 		FONT_COLOR_1=$WHITE; BACKGROUND_1=$BLUE; TEXTEFFECT_1=$BOLD
 		FONT_COLOR_2=$WHITE; BACKGROUND_2=$L_BLUE; TEXTEFFECT_2=$BOLD	
 		FONT_COLOR_3=$D_GRAY; BACKGROUND_3=$WHITE; TEXTEFFECT_3=$BOLD	
+		FONT_COLOR_4=$BLACK;TEXTEFFECT_4=$BLINK	
 		PROMT_FORMAT=$CYAN_BOLD
 	fi
 	
@@ -322,7 +332,15 @@ bash_prompt() {
 		FONT_COLOR_3=$BLACK; BACKGROUND_3=$L_CYAN; TEXTEFFECT_3=$BOLD
 		PROMT_FORMAT=$CYAN_BOLD
 	fi
-	
+
+	## CONFIGURATION: GREENTOX
+	if [ "$HOSTNAME" = aphrodite ]; then
+		FONT_COLOR_1=$WHITE; BACKGROUND_1=$GREEN; TEXTEFFECT_1=$BOLD
+		FONT_COLOR_2=$D_GRAY; BACKGROUND_2=$L_GREEN; TEXTEFFECT_2=$BOLD
+		FONT_COLOR_3=$GRAY; BACKGROUND_3=$WHITE; TEXTEFFECT_3=$BOLD
+		FONT_COLOR_4=$BLACK; TEXTEFFECT_4=$BLINK
+		PROMT_FORMAT=$TOXIC_GREEN_BOLD
+	fi
 	
 	##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  
 	  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##  ##
@@ -441,7 +459,7 @@ bash_prompt() {
 
 
 	## For terminal line coloring, leaving the rest standard
-	none="$(tput sgr0)"
+	none="$(tty -s && tput sgr0)"
 	trap 'echo -ne "${none}"' DEBUG
 }
 
