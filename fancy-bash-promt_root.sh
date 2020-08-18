@@ -37,6 +37,15 @@
 ##
 ##	Alternatively, copy the content of this file into your .bashrc file
 ##
+##      Alternatively, copy the content of this file into your .bashrc file
+##      To keep things a little more structured keep this in a separate file
+##      in the home folder and add the path to it to the .bashrc file like this:
+##
+##              if [ -f ~/.fancy-bash-promt.sh ]; then
+##                  . ~/.fancy-bash-promt.sh
+##              fi
+##
+##      This will work the same and keep it more tidy.
 ##
 ##
 ##	FUNCTIONS:
